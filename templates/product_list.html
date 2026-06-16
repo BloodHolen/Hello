@@ -5,6 +5,12 @@
 
 <h2 class="page-title">Список товаров</h2>
 
+{% if user.is_authenticated and user.role == 'admin' %}
+<div style="margin-bottom:15px;">
+    <a href="{% url 'product_add' %}" class="btn btn-accent">+ Добавить товар</a>
+</div>
+{% endif %}
+
 {% if can_filter %}
 <div class="filters">
     <form method="get" id="filter-form">

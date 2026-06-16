@@ -38,12 +38,6 @@ class PickupPointAdmin(admin.ModelAdmin):
     pass
 
 
-class OrderItemInline(admin.TabularInline):
-    model = OrderItem
-    extra = 1
-
-
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    inlines = [OrderItemInline]
     list_display = ('code', 'order_number', 'order_date', 'status')

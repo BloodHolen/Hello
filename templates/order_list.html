@@ -5,36 +5,52 @@
 
 <h2 class="page-title">Список заказов</h2>
 
-{% for order in orders %}
-<div class="order-card">
-    <div class="order-inner">
-        <div class="order-col order-info-col">
-            <div class="order-header">Заказ №{{ order.order_number }} ({{ order.code }})</div>
-            <div class="order-field">Статус: {{ order.get_status_display }}</div>
-            <div class="order-field">Адрес пункта выдачи: {{ order.pickup_point.address }}</div>
-            <div class="order-field">Дата заказа: {{ order.order_date|date:"d.m.Y" }}</div>
-            <div class="order-field">Состав:
+{% if is_admin %}
+<div style="margin-bottom:15px;">
+    <a href="{% url 'order_add' %}" class="btn btn-accent">+ Добавить заказ</a>
+</div>
+{% endif %}
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>№ заказа</th>
+            <th>Дата заказа</th>
+            <th>Дата доставки</th>
+            <th>Статус</th>
+            <th>Адрес пункта выдачи</th>
+            <th>Состав</th>
+            {% if is_admin %}<th>Действия</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.order_number }} ({{ order.code }})</td>
+            <td>{{ order.order_date|date:"d.m.Y" }}</td>
+            <td>{{ order.delivery_date|date:"d.m.Y" }}</td>
+            <td>{{ order.get_status_display }}</td>
+            <td>{{ order.pickup_point.address }}</td>
+            <td>
                 {% for item in order.items.all %}
                     {{ item.product.article }} ({{ item.quantity }} шт.){% if not forloop.last %}, {% endif %}
                 {% endfor %}
-            </div>
-        </div>
-        <div class="order-col order-delivery-col">
-            Дата доставки<br>
-            <strong>{{ order.delivery_date|date:"d.m.Y" }}</strong>
-        </div>
-        {% if is_admin %}
-        <div class="order-actions">
-            <a href="{% url 'order_edit' order.pk %}" class="btn">Редактировать</a>
-            <form method="post" action="{% url 'order_delete' order.pk %}" class="inline-form" onsubmit="return confirm('Удалить заказ?')">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Удалить</button>
-            </form>
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% empty %}
-<div class="empty-state">Заказы не найдены</div>
-{% endfor %}
+            </td>
+            {% if is_admin %}
+            <td>
+                <a href="{% url 'order_edit' order.pk %}" class="btn">Изменить</a>
+                <form method="post" action="{% url 'order_delete' order.pk %}" class="inline-form" onsubmit="return confirm('Удалить заказ?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="{% if is_admin %}7{% else %}6{% endif %}" class="empty-state">Заказы не найдены</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

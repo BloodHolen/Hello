@@ -372,6 +372,36 @@ body {
     display: inline;
 }
 
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #DEB887;
+}
+
+.data-table th {
+    background: #F5DEB3;
+    padding: 10px 8px;
+    text-align: left;
+    font-size: 13px;
+    border: 1px solid #DEB887;
+}
+
+.data-table td {
+    padding: 8px;
+    border: 1px solid #DEB887;
+    font-size: 13px;
+}
+
+.data-table tr:hover {
+    background: #FFF8F0;
+}
+
+.data-table .btn {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
 .page-title {
     font-size: 22px;
     margin-bottom: 20px;
