@@ -27,10 +27,8 @@ if not exist .env (
 echo [4/4] Применение миграций...
 python manage.py migrate
 
-:: Запуск
 echo.
 echo ========================================
-echo Все готово! Запуск сервера...
+echo Все готово! Используйте start.bat для запуска
 echo ========================================
-python manage.py runserver
 pause
