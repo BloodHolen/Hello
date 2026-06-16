@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Редактирование заказа{% else %}Добавление заказа{% endif %} - МирИгрушек{% endblock %}
+{% block content %}
+<div class="form-container">
+    <h2>{% if is_edit %}Редактирование заказа №{{ order.order_number }}{% else %}Добавление нового заказа{% endif %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Код заказа</label>
+            <input type="text" name="code" value="{{ order.code|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Номер заказа</label>
+            <input type="number" name="order_number" value="{{ order.order_number|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Дата заказа</label>
+            <input type="date" name="order_date" value="{{ order.order_date|date:'Y-m-d'|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Дата доставки</label>
+            <input type="date" name="delivery_date" value="{{ order.delivery_date|date:'Y-m-d'|default:'' }}" required>
+        </div>
+        <div class="form-group">
+            <label>Пункт выдачи</label>
+            <select name="pickup_point" required>
+                {% for p in pickup_points %}
+                    <option value="{{ p.pk }}" {% if order.pickup_point_id == p.pk %}selected{% endif %}>{{ p.address }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Клиент</label>
+            <select name="client" required>
+                {% for c in clients %}
+                    <option value="{{ c.pk }}" {% if order.client_id == c.pk %}selected{% endif %}>{{ c.last_name }} {{ c.first_name }} {{ c.patronymic }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Статус</label>
+            <select name="status" required>
+                <option value="новый" {% if order.status == 'новый' %}selected{% endif %}>Новый</option>
+                <option value="выдан" {% if order.status == 'выдан' %}selected{% endif %}>Выдан</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Состав заказа</label>
+            <div class="items-section" id="items-section">
+                <div class="item-row template-row" style="display:none;">
+                    <select name="product_id[]">
+                        {% for p in products %}
+                            <option value="{{ p.pk }}">{{ p.article }} - {{ p.name|truncatechars:40 }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="quantity[]" placeholder="Кол-во" min="1" value="1">
+                    <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">×</button>
+                </div>
+                {% if is_edit and order.items.all %}
+                    {% for item in order.items.all %}
+                    <div class="item-row">
+                        <select name="product_id[]">
+                            {% for p in products %}
+                                <option value="{{ p.pk }}" {% if item.product_id == p.pk %}selected{% endif %}>{{ p.article }} - {{ p.name|truncatechars:40 }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" name="quantity[]" placeholder="Кол-во" min="1" value="{{ item.quantity }}">
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="item-row">
+                    <select name="product_id[]">
+                        {% for p in products %}
+                            <option value="{{ p.pk }}">{{ p.article }} - {{ p.name|truncatechars:40 }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="quantity[]" placeholder="Кол-во" min="1" value="1">
+                </div>
+                {% endif %}
+            </div>
+            <button type="button" class="btn" onclick="addItem()" style="margin-top:8px;">+ Добавить позицию</button>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-accent">Сохранить</button>
+            <a href="{% url 'order_list' %}" class="btn">Отмена</a>
+        </div>
+    </form>
+</div>
+<script>
+function addItem() {
+    var template = document.querySelector('.template-row');
+    var clone = template.cloneNode(true);
+    clone.style.display = '';
+    clone.classList.remove('template-row');
+    document.getElementById('items-section').appendChild(clone);
+}
+</script>
+{% endblock %}

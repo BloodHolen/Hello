@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Товары - МирИгрушек{% endblock %}
+{% block content %}
+{% load static %}
+
+<h2 class="page-title">Список товаров</h2>
+
+{% if can_filter %}
+<div class="filters">
+    <form method="get" id="filter-form">
+        <input type="text" name="search" placeholder="Поиск..." value="{{ search_query }}">
+        <select name="supplier">
+            <option value="">Все поставщики</option>
+            {% for s in suppliers %}
+                <option value="{{ s.name }}" {% if supplier_filter == s.name %}selected{% endif %}>{{ s.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="sort">
+            <option value="">Без сортировки</option>
+            <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Цена ↑</option>
+            <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Цена ↓</option>
+            <option value="qty_asc" {% if sort_by == 'qty_asc' %}selected{% endif %}>Количество ↑</option>
+            <option value="qty_desc" {% if sort_by == 'qty_desc' %}selected{% endif %}>Количество ↓</option>
+        </select>
+    </form>
+</div>
+<script>
+document.querySelector('#filter-form input').addEventListener('input', function() {
+    document.querySelector('#filter-form').submit();
+});
+document.querySelector('#filter-form select').addEventListener('change', function() {
+    document.querySelector('#filter-form').submit();
+});
+</script>
+{% endif %}
+
+{% for product in products %}
+{% with discount=product.discount %}
+<div class="product-card{% if discount > 17 %} discount-highlight{% elif product.quantity == 0 %} out-of-stock{% endif %}">
+    <div class="card-inner">
+        <div class="card-column photo-col">
+            {% if product.photo %}
+                <img src="{{ product.photo.url }}" alt="{{ product.name }}">
+            {% else %}
+                <img src="{% static 'img/picture.png' %}" alt="Нет фото">
+            {% endif %}
+        </div>
+        <div class="card-column info-col">
+            <div class="info-header">{{ product.category.name }} | {{ product.name }}</div>
+            <div class="info-field">Описание товара: {{ product.description|truncatewords:20 }}</div>
+            <div class="info-field">Производитель: {{ product.manufacturer.name }}</div>
+            <div class="info-field">Поставщик: {{ product.supplier.name }}</div>
+            <div class="info-field">
+                Цена:
+                {% if discount > 0 %}
+                    <span class="price-old">{{ product.price }} ₽</span>
+                    <span class="price-new">{{ product.discounted_price|floatformat:2 }} ₽</span>
+                {% else %}
+                    {{ product.price }} ₽
+                {% endif %}
+            </div>
+            <div class="info-field">Единица измерения: {{ product.unit.name }}</div>
+            <div class="info-field">Количество на складе: {{ product.quantity }}</div>
+            {% if not is_guest and user.role == 'admin' %}
+            <div class="info-field" style="margin-top:8px;">
+                <a href="{% url 'product_edit' product.pk %}" class="btn">Редактировать</a>
+                <form method="post" action="{% url 'product_delete' product.pk %}" class="inline-form" onsubmit="return confirm('Удалить товар?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-column discount-col">
+            Действующая<br>скидка<br>
+            <strong>{{ discount }}%</strong>
+        </div>
+    </div>
+</div>
+{% endwith %}
+{% empty %}
+<div class="empty-state">Товары не найдены</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Вход - МирИгрушек{% endblock %}
+{% block content %}
+{% load static %}
+<div class="login-container">
+    <img src="{% static 'img/icon.png' %}" alt="Логотип" height="80">
+    <h2>Вход в систему</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Логин" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <button type="submit" class="btn btn-accent">Войти</button>
+        <a href="{% url 'product_list' %}" class="btn">Войти как гость</a>
+    </form>
+</div>
+{% endblock %}

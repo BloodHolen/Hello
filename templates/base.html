@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}МирИгрушек{% endblock %}</title>
+    {% load static %}
+    <link rel="icon" type="image/x-icon" href="{% static 'img/icon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img src="{% static 'img/icon.png' %}" alt="Логотип" class="logo" height="50">
+            <h1>ООО «МирИгрушек»</h1>
+        </div>
+        <div class="header-right">
+            {% if user.is_authenticated %}
+                <span class="user-name">{{ user_full_name }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-accent">Выйти</a>
+            {% endif %}
+        </div>
+    </div>
+    <nav class="nav-bar">
+        <a href="{% url 'product_list' %}" class="btn">Товары</a>
+        {% if user.is_authenticated and user.role != 'client' %}
+            <a href="{% url 'order_list' %}" class="btn">Заказы</a>
+        {% endif %}
+        {% if user.is_authenticated and user.role == 'admin' %}
+            <a href="{% url 'product_add' %}" class="btn btn-accent">Добавить товар</a>
+        {% endif %}
+        {% if user.is_authenticated and user.role == 'admin' %}
+            <a href="{% url 'order_add' %}" class="btn btn-accent">Добавить заказ</a>
+        {% endif %}
+    </nav>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
