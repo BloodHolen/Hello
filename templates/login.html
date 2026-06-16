@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход - МирИгрушек</title>
-    {% load static %}
-    <link rel="icon" type="image/x-icon" href="{% static 'img/icon.ico' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <div class="login-container">
-        <img src="{% static 'img/icon.jpg' %}" alt="Логотип" height="100">
-        <h2>Вход в систему</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="text" name="username" placeholder="Логин" required>
-            <input type="password" name="password" placeholder="Пароль" required>
-            <button type="submit" class="btn btn-accent">Войти</button>
-            <a href="{% url 'product_list' %}" class="btn">Войти как гость</a>
-        </form>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Вход - МирИгрушек{% endblock %}
+{% block content %}
+{% load static %}
+<div class="login-container">
+    <h2>Вход в систему</h2>
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Логин" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <button type="submit" class="btn btn-accent">Войти</button>
+        <a href="{% url 'product_list' %}" class="btn">Войти как гость</a>
+    </form>
+</div>
+{% endblock %}

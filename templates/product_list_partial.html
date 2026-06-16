@@ -1,0 +1,47 @@
+{% load static %}
+{% for product in products %}
+{% with discount=product.discount %}
+<div class="product-card{% if discount > 17 %} discount-highlight{% elif product.quantity == 0 %} out-of-stock{% endif %}">
+    <div class="card-inner">
+        <div class="card-col photo-col">
+            {% if product.photo %}
+                <img src="{{ product.photo.url }}" alt="{{ product.name }}">
+            {% else %}
+                <img src="{% static 'img/picture.png' %}" alt="Нет фото">
+            {% endif %}
+        </div>
+        <div class="card-col info-col">
+            <div class="info-header"><span class="category-badge">{{ product.category.name }}</span> {{ product.name }}</div>
+            <div class="info-field">Описание товара: {{ product.description }}</div>
+            <div class="info-field">Производитель: {{ product.manufacturer.name }}</div>
+            <div class="info-field">Поставщик: {{ product.supplier.name }}</div>
+            <div class="info-field">
+                Цена:
+                {% if discount > 0 %}
+                    <span class="price-old">{{ product.price }} ₽</span>
+                    <span class="price-new">{{ product.discounted_price|floatformat:2 }} ₽</span>
+                {% else %}
+                    {{ product.price }} ₽
+                {% endif %}
+            </div>
+            <div class="info-field">Количество на складе: {{ product.quantity }} {{ product.unit.name }}</div>
+            {% if not is_guest and user.role == 'admin' %}
+            <div class="info-field" style="margin-top:8px;">
+                <a href="{% url 'product_edit' product.pk %}" class="btn">Редактировать</a>
+                <form method="post" action="{% url 'product_delete' product.pk %}" class="inline-form" onsubmit="return confirm('Удалить товар?')">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        <div class="card-col discount-col">
+            Действующая<br>скидка<br>
+            <strong>{{ discount }}%</strong>
+        </div>
+    </div>
+</div>
+{% endwith %}
+{% empty %}
+<div class="empty-state">Товары не найдены</div>
+{% endfor %}

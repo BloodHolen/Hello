@@ -1,0 +1,73 @@
+Table User {
+  id int [pk, increment]
+  username varchar(150) [not null, unique]
+  password varchar(128) [not null]
+  email varchar(254) [not null]
+  first_name varchar(150) [not null]
+  last_name varchar(150) [not null]
+  patronymic varchar(150)
+  role varchar(20) [not null]
+  is_superuser bool
+  is_staff bool
+  is_active bool
+  date_joined datetime
+  last_login datetime
+}
+
+Table Category {
+  id int [pk, increment]
+  name varchar(200) [not null, unique]
+}
+
+Table Manufacturer {
+  id int [pk, increment]
+  name varchar(200) [not null, unique]
+}
+
+Table Supplier {
+  id int [pk, increment]
+  name varchar(200) [not null, unique]
+}
+
+Table Unit {
+  id int [pk, increment]
+  name varchar(50) [not null, unique]
+}
+
+Table Product {
+  id int [pk, increment]
+  article varchar(50) [not null, unique]
+  name varchar(500) [not null]
+  price decimal(10,2) [not null]
+  discount int [not null, default: 0]
+  quantity int [not null, default: 0]
+  description text
+  photo varchar(100)
+  category_id int [ref: > Category.id]
+  manufacturer_id int [ref: > Manufacturer.id]
+  supplier_id int [ref: > Supplier.id]
+  unit_id int [ref: > Unit.id]
+}
+
+Table PickupPoint {
+  id int [pk, increment]
+  address varchar(500) [not null, unique]
+}
+
+Table Order {
+  id int [pk, increment]
+  code varchar(50) [not null, unique]
+  order_number int [not null]
+  order_date date [not null]
+  delivery_date date [not null]
+  status varchar(20) [not null]
+  client_id int [ref: > User.id]
+  pickup_point_id int [ref: > PickupPoint.id]
+}
+
+Table OrderItem {
+  id int [pk, increment]
+  quantity int [not null]
+  order_id int [ref: > Order.id]
+  product_id int [ref: > Product.id]
+}

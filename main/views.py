@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Q
+
 from .models import Product, Order, OrderItem, Category, Supplier, Unit, Manufacturer, PickupPoint, User
 from .decorators import role_required
 import os
@@ -51,14 +52,15 @@ def product_list(request):
 
     if can_filter:
         if search_query:
-            products = products.filter(
-                Q(name__icontains=search_query) |
-                Q(article__icontains=search_query) |
-                Q(description__icontains=search_query) |
-                Q(category__name__icontains=search_query) |
-                Q(manufacturer__name__icontains=search_query) |
-                Q(supplier__name__icontains=search_query)
-            )
+            sq = search_query.lower()
+            products = [p for p in products if
+                sq in p.name.lower() or
+                sq in p.article.lower() or
+                sq in (p.description or '').lower() or
+                sq in p.category.name.lower() or
+                sq in p.manufacturer.name.lower() or
+                sq in p.supplier.name.lower()
+            ]
         if supplier_filter:
             products = products.filter(supplier__name=supplier_filter)
         if sort_by == 'price_asc':
@@ -80,6 +82,9 @@ def product_list(request):
         'supplier_filter': supplier_filter,
         'user_full_name': str(user) if user.is_authenticated else '',
     }
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render(request, 'product_list_partial.html', context)
     return render(request, 'product_list.html', context)
 
 

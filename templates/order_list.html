@@ -15,6 +15,7 @@
     <thead>
         <tr>
             <th>№ заказа</th>
+            <th>Код заказа</th>
             <th>Дата заказа</th>
             <th>Дата доставки</th>
             <th>Статус</th>
@@ -26,7 +27,8 @@
     <tbody>
         {% for order in orders %}
         <tr>
-            <td>{{ order.order_number }} ({{ order.code }})</td>
+            <td>{{ order.order_number }}</td>
+            <td>{{ order.code }}</td>
             <td>{{ order.order_date|date:"d.m.Y" }}</td>
             <td>{{ order.delivery_date|date:"d.m.Y" }}</td>
             <td>{{ order.get_status_display }}</td>
@@ -38,17 +40,19 @@
             </td>
             {% if is_admin %}
             <td>
-                <a href="{% url 'order_edit' order.pk %}" class="btn">Изменить</a>
-                <form method="post" action="{% url 'order_delete' order.pk %}" class="inline-form" onsubmit="return confirm('Удалить заказ?')">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Удалить</button>
-                </form>
+                <div class="action-btns">
+                    <a href="{% url 'order_edit' order.pk %}" class="btn">Изменить</a>
+                    <form method="post" action="{% url 'order_delete' order.pk %}" onsubmit="return confirm('Удалить заказ?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </div>
             </td>
             {% endif %}
         </tr>
         {% empty %}
         <tr>
-            <td colspan="{% if is_admin %}7{% else %}6{% endif %}" class="empty-state">Заказы не найдены</td>
+            <td colspan="{% if is_admin %}8{% else %}7{% endif %}" class="empty-state">Заказы не найдены</td>
         </tr>
         {% endfor %}
     </tbody>
